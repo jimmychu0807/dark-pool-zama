@@ -1,7 +1,15 @@
 [package]
-name = "fhe-dark-pool"
+name = "dark-pool-zama"
 version = "0.1.0"
 edition = "2024"
 
 [dependencies]
 tfhe = { version = "~1.2.0", features = ["boolean", "shortint", "integer"] }
+
+[lib]
+name = "dark_pool"
+path = "src/lib.rs"
+
+[[bin]]
+name = "main"
+path = "src/main.rs"

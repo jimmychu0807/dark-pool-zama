@@ -120,6 +120,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "dark-pool-zama"
+version = "0.1.0"
+dependencies = [
+ "tfhe",
+]
+
+[[package]]
 name = "digest"
 version = "0.10.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -162,13 +169,6 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn",
-]
-
-[[package]]
-name = "fhe-dark-pool"
-version = "0.1.0"
-dependencies = [
- "tfhe",
 ]
 
 [[package]]
