@@ -23,6 +23,6 @@ fn main() {
 	let enc_result = dp.volume_matching(enc_b_orders, enc_s_orders);
 
 	// client-side
-	let matched_result = decrypt_txs(enc_result);
+	let matched_result = decrypt_txs(enc_result, &client_key);
 	assert_eq!(matched_result, vec![(1, 0), (2, 30), (3, 80)]);
 }
