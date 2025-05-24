@@ -9,7 +9,7 @@ impl DarkPool {
 	pub fn new(sks: ServerKey) -> Self {
 		set_server_key(sks);
 
-		return DarkPool {};
+		DarkPool {}
 	}
 
 	pub fn volume_matching(
@@ -17,6 +17,7 @@ impl DarkPool {
 		enc_b_orders: Vec<EncItemQty>,
 		enc_s_orders: Vec<EncItemQty>,
 	) -> Vec<EncItemQty> {
-		return vec![(FheUint32::encrypt_trivial(2u32), FheUint32::encrypt_trivial(100u32))];
+
+		vec![(FheUint32::encrypt_trivial(2u32), FheUint32::encrypt_trivial(100u32))]
 	}
 }
