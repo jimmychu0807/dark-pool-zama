@@ -1,10 +1,10 @@
+use std::collections::HashMap;
+use std::hash::{Hash, Hasher};
 use tfhe::prelude::*;
 use tfhe::{FheUint32, ServerKey, set_server_key};
-use std::collections::HashMap;
-use std::hash::{ Hash, Hasher };
 
 mod traits;
-use traits::{DarkPool};
+pub use traits::DarkPool;
 
 pub type EncItemQty = (FheUint32, FheUint32);
 
@@ -23,7 +23,6 @@ impl DarkPool<EncItemQty> for FheDarkPool {
 		enc_b_orders: Vec<EncItemQty>,
 		enc_s_orders: Vec<EncItemQty>,
 	) -> Vec<EncItemQty> {
-
 		// let mut buy_orders = HashMap::new();
 
 		// for (enc_item, enc_qty) in enc_b_orders {

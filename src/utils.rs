@@ -1,4 +1,4 @@
-use dark_pool::{EncItemQty};
+use dark_pool::EncItemQty;
 use tfhe::prelude::*;
 use tfhe::{ClientKey, FheUint32};
 
@@ -12,11 +12,9 @@ pub fn encrypt_orders(orders: Vec<ItemQty>, ck: &ClientKey) -> Vec<EncItemQty> {
 }
 
 pub fn decrypt_txs(enc_txs: Vec<EncItemQty>, ck: &ClientKey) -> Vec<ItemQty> {
-	let mut decrypted: Vec<ItemQty> = enc_txs
-		.iter()
-		.map(|(en1, en2)| (en1.decrypt(ck), en2.decrypt(ck)))
-		.collect();
+	let mut decrypted: Vec<ItemQty> =
+		enc_txs.iter().map(|(en1, en2)| (en1.decrypt(ck), en2.decrypt(ck))).collect();
 
-	decrypted.sort_by(|a,b| a.0.cmp(&b.0));
+	decrypted.sort_by(|a, b| a.0.cmp(&b.0));
 	decrypted
 }

@@ -4,8 +4,11 @@ use tfhe::{ConfigBuilder, FheUint8, generate_keys, set_server_key};
 mod utils;
 use utils::{decrypt_txs, encrypt_orders};
 
+mod traits;
+use traits::DarkPool;
+
 mod plain_dark_pool;
-use plain_dark_pool::{ PlainDarkPool };
+use plain_dark_pool::PlainDarkPool;
 
 fn main() {
 	// let config = ConfigBuilder::default().build();
