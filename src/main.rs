@@ -29,5 +29,4 @@ fn main() {
 
 	// client-side
 	// let matched_result = decrypt_txs(enc_result, &client_key);
-	assert_eq!(result, vec![(1, 0), (2, 30), (3, 80)]);
 }

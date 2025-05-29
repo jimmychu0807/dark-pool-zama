@@ -22,7 +22,7 @@ impl DarkPool<EncItemQty> for FheDarkPool {
 		&self,
 		enc_b_orders: Vec<EncItemQty>,
 		enc_s_orders: Vec<EncItemQty>,
-	) -> Vec<EncItemQty> {
+	) -> (Vec<EncItemQty>, Vec<EncItemQty>) {
 		// let mut buy_orders = HashMap::new();
 
 		// for (enc_item, enc_qty) in enc_b_orders {
@@ -33,7 +33,7 @@ impl DarkPool<EncItemQty> for FheDarkPool {
 		// 	buy_orders.insert(enc_item, val);
 		// }
 
-		vec![(FheUint32::encrypt_trivial(2u32), FheUint32::encrypt_trivial(100u32))]
+		(vec![], vec![])
 	}
 }
 
