@@ -15,7 +15,7 @@ impl DarkPool<ItemQty> for PlainDarkPool {
 	fn volume_matching(&self, b_orders: Vec<ItemQty>, s_orders: Vec<ItemQty>) -> (Vec<ItemQty>, Vec<ItemQty>) {
 		// aggregate up on buy orders
 		let mut agg_buy = HashMap::new();
-		for (item, qty) in b_orders {
+		for (item, qty) in b_orders.clone() {
 			agg_buy.insert(item, match agg_buy.get(&item) {
 				Some(v) => v + qty,
 				None => qty,
@@ -24,7 +24,7 @@ impl DarkPool<ItemQty> for PlainDarkPool {
 
 		// aggregate up on sell orders
 		let mut agg_sell = HashMap::new();
-		for (item, qty) in s_orders {
+		for (item, qty) in s_orders.clone() {
 			agg_sell.insert(item, match agg_sell.get(&item) {
 				Some(v) => v + qty,
 				None => qty,
@@ -42,13 +42,13 @@ impl DarkPool<ItemQty> for PlainDarkPool {
 
 		println!("transact_items: {:?}", &transact_items);
 
-		let fulfill_order = |orders: &Vec<ItemQty>, transact_items: HashMap<u32, u32> | -> Vec<ItemQty> {
-			let transacted_orders = Vec::<ItemQty>::new();
+		let fulfill_order = |orders: &Vec<ItemQty>, mut transact_items: HashMap<&u32, &u32> | -> Vec<ItemQty> {
+			let mut transacted_orders = Vec::<ItemQty>::new();
 			for (item, qty) in orders {
-				let reserved = transact_items.get(item).unwrap_or(&0);
+				let reserved = *(transact_items.get(item).unwrap_or(&&0));
 				let transacted_qty = cmp::min(qty, reserved);
 				transacted_orders.push((*item, *transacted_qty));
-				transact_items.insert(*item, reserved - transacted_qty);
+				transact_items.insert(item, &(reserved - transacted_qty));
 			}
 
 			transacted_orders
