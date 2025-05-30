@@ -8,8 +8,8 @@ pub type EncItemQty = (FheUint32, FheUint32);
 pub struct FheDarkPool {}
 
 impl FheDarkPool {
-	pub fn new(sks: ServerKey) -> Self {
-		set_server_key(sks);
+	pub fn new(sk: ServerKey) -> Self {
+		set_server_key(sk);
 		Self {}
 	}
 }
