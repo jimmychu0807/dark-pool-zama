@@ -20,4 +20,6 @@ fmt:
 
 .PHONY: example
 example:
-	cargo remote -r dev -- run -r --example plain_dark_pool
+	cargo remote -r dev -- run -r --example $(filter-out $@,$(MAKECMDGOALS))
+%::
+	@:
