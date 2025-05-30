@@ -27,7 +27,9 @@ fn main() {
 
 	let b_fulfilled = decrypt_orders(enc_b_fulfilled, &ck);
 	println!("b_fulfilled: {:?}", b_fulfilled);
+	assert_eq!(b_fulfilled, vec![(1, 0), (2, 30), (3, 80)]);
 
 	let s_fulfilled = decrypt_orders(enc_s_fulfilled, &ck);
 	println!("s_fulfilled: {:?}", s_fulfilled);
+	assert_eq!(s_fulfilled, vec![(3, 40), (3, 40), (2, 30)]);
 }

@@ -41,24 +41,37 @@ impl DarkPool<EncItemQty> for FheDarkPool {
 		let agg_buy = aggregate_orders(&enc_b_orders);
 		let agg_sell = aggregate_orders(&enc_s_orders);
 
+		let mut transact_items = Vec::new();
+		for i in 0..agg_buy.len() {
+			transact_items.push(agg_buy[i].min(&agg_sell[i]));
+		}
 
+		let fulfill_orders = |orders: &Vec<EncItemQty>, mut transact_items: Vec<FheUint32> |-> Vec<EncItemQty> {
+			let mut transacted_orders = Vec::<EncItemQty>::new();
 
-		// let mut buy_orders = HashMap::new();
+			let enc_zero = FheUint32::try_encrypt_trivial(0u32).unwrap();
 
-		// for (enc_item, enc_qty) in enc_b_orders {
-		// 	let val = match buy_orders.contains_key(&enc_item) {
-		// 		true => buy_orders.get(&enc_item) + enc_qty,
-		// 		false => enc_qty,
-		// 	};
-		// 	buy_orders.insert(enc_item, val);
-		// }
+			for i in 0..orders.len() {
+				let mut tx_qty = enc_zero.clone();
 
-		(vec![], vec![])
+				for j in 0..transact_items.len() {
+					let enc_j = FheUint32::try_encrypt_trivial(j as u32).unwrap();
+
+					// Is the current `transact_items[j]` matches with `orders[i].0`?
+					let b_item = enc_j.eq(&orders[i].0);
+					tx_qty = tx_qty.max(&b_item.select(&orders[i].1.min(&transact_items[j]) , &enc_zero));
+
+					// update transact_items how much qty left after this order is fulfilled
+					transact_items[j] -= b_item.select(&tx_qty, &enc_zero);
+				}
+				transacted_orders.push((orders[i].0.clone(), tx_qty));
+			}
+			transacted_orders
+		};
+
+		let b_fulfilled = fulfill_orders(&enc_b_orders, transact_items.clone());
+		let s_fulfilled = fulfill_orders(&enc_s_orders, transact_items.clone());
+
+		(b_fulfilled, s_fulfilled)
 	}
 }
-
-// impl Hash for FheUint32 {
-// 	fn hash<H: Hasher>(&self, state: &mut H) {
-
-// 	}
-// }
