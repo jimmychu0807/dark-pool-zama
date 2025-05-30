@@ -6,15 +6,13 @@ use crate::traits::DarkPool;
 pub type EncItemQty = (FheUint32, FheUint32);
 
 pub struct FheDarkPool {
-	max_items: u32
+	max_items: u32,
 }
 
 impl FheDarkPool {
 	pub fn new(sk: ServerKey, max_items: u32) -> Self {
 		set_server_key(sk);
-		Self {
-			max_items
-		}
+		Self { max_items }
 	}
 }
 
@@ -25,10 +23,9 @@ impl DarkPool<EncItemQty> for FheDarkPool {
 		enc_s_orders: Vec<EncItemQty>,
 	) -> (Vec<EncItemQty>, Vec<EncItemQty>) {
 		// NX> loop thru the enc_b_orders here
-		let aggregate_orders = | enc_orders: &Vec<EncItemQty> | -> Vec<FheUint32> {
-			let mut aggregate: Vec<FheUint32> = (0..self.max_items)
-				.map(|_| FheUint32::try_encrypt_trivial(0u32).unwrap())
-				.collect();
+		let aggregate_orders = |enc_orders: &Vec<EncItemQty>| -> Vec<FheUint32> {
+			let mut aggregate: Vec<FheUint32> =
+				(0..self.max_items).map(|_| FheUint32::try_encrypt_trivial(0u32).unwrap()).collect();
 			for i in 0..self.max_items {
 				let enc_i = FheUint32::try_encrypt_trivial(i).unwrap();
 				for (ok, oq) in enc_orders {
@@ -46,28 +43,29 @@ impl DarkPool<EncItemQty> for FheDarkPool {
 			transact_items.push(agg_buy[i].min(&agg_sell[i]));
 		}
 
-		let fulfill_orders = |orders: &Vec<EncItemQty>, mut transact_items: Vec<FheUint32> |-> Vec<EncItemQty> {
-			let mut transacted_orders = Vec::<EncItemQty>::new();
+		let fulfill_orders =
+			|orders: &Vec<EncItemQty>, mut transact_items: Vec<FheUint32>| -> Vec<EncItemQty> {
+				let mut transacted_orders = Vec::<EncItemQty>::new();
 
-			let enc_zero = FheUint32::try_encrypt_trivial(0u32).unwrap();
+				let enc_zero = FheUint32::try_encrypt_trivial(0u32).unwrap();
 
-			for i in 0..orders.len() {
-				let mut tx_qty = enc_zero.clone();
+				for i in 0..orders.len() {
+					let mut tx_qty = enc_zero.clone();
 
-				for j in 0..transact_items.len() {
-					let enc_j = FheUint32::try_encrypt_trivial(j as u32).unwrap();
+					for j in 0..transact_items.len() {
+						let enc_j = FheUint32::try_encrypt_trivial(j as u32).unwrap();
 
-					// Is the current `transact_items[j]` matches with `orders[i].0`?
-					let b_item = enc_j.eq(&orders[i].0);
-					tx_qty = tx_qty.max(&b_item.select(&orders[i].1.min(&transact_items[j]) , &enc_zero));
+						// Is the current `transact_items[j]` matches with `orders[i].0`?
+						let b_item = enc_j.eq(&orders[i].0);
+						tx_qty = tx_qty.max(&b_item.select(&orders[i].1.min(&transact_items[j]), &enc_zero));
 
-					// update transact_items how much qty left after this order is fulfilled
-					transact_items[j] -= b_item.select(&tx_qty, &enc_zero);
+						// update transact_items how much qty left after this order is fulfilled
+						transact_items[j] -= b_item.select(&tx_qty, &enc_zero);
+					}
+					transacted_orders.push((orders[i].0.clone(), tx_qty));
 				}
-				transacted_orders.push((orders[i].0.clone(), tx_qty));
-			}
-			transacted_orders
-		};
+				transacted_orders
+			};
 
 		let b_fulfilled = fulfill_orders(&enc_b_orders, transact_items.clone());
 		let s_fulfilled = fulfill_orders(&enc_s_orders, transact_items.clone());

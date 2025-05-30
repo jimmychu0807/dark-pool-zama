@@ -37,18 +37,17 @@ impl DarkPool<ItemQty> for PlainDarkPool {
 			aggregate
 		};
 
-		let fulfill_orders =
-			|orders: &Vec<ItemQty>, mut transact_items: HashMap<u32, u32>| -> Vec<ItemQty> {
-				let mut transacted_orders = Vec::<ItemQty>::new();
-				for (item, qty) in orders {
-					let reserved = *(transact_items.get(item).unwrap_or(&0));
-					let transacted_qty = cmp::min(*qty, reserved);
-					transacted_orders.push((*item, transacted_qty));
-					transact_items.insert(*item, reserved - transacted_qty);
-				}
+		let fulfill_orders = |orders: &Vec<ItemQty>, mut transact_items: HashMap<u32, u32>| -> Vec<ItemQty> {
+			let mut transacted_orders = Vec::<ItemQty>::new();
+			for (item, qty) in orders {
+				let reserved = *(transact_items.get(item).unwrap_or(&0));
+				let transacted_qty = cmp::min(*qty, reserved);
+				transacted_orders.push((*item, transacted_qty));
+				transact_items.insert(*item, reserved - transacted_qty);
+			}
 
-				transacted_orders
-			};
+			transacted_orders
+		};
 
 		// aggregate up on buy and sell orders
 		let agg_buy = aggregate_orders(&b_orders);
@@ -57,10 +56,8 @@ impl DarkPool<ItemQty> for PlainDarkPool {
 		// items remained for transactions
 		let mut transact_items = HashMap::<u32, u32>::new();
 		for key in agg_buy.keys() {
-			transact_items.insert(
-				*key,
-				cmp::min(*agg_buy.get(key).unwrap(), *agg_sell.get(key).unwrap_or(&0)),
-			);
+			transact_items
+				.insert(*key, cmp::min(*agg_buy.get(key).unwrap(), *agg_sell.get(key).unwrap_or(&0)));
 		}
 
 		let b_fulfilled = fulfill_orders(&b_orders, transact_items.clone());
