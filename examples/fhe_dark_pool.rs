@@ -3,6 +3,8 @@ use tfhe::{generate_keys, ConfigBuilder};
 use dark_pool::{FheDarkPool, traits::DarkPool};
 use dark_pool::utils::{encrypt_orders, decrypt_orders};
 
+const ITEMS: u32 = 10;
+
 fn main() {
     let config = ConfigBuilder::default().build();
 
@@ -17,7 +19,7 @@ fn main() {
 	let enc_s_orders = encrypt_orders(&s_orders, &ck);
 
 	// server-side processing
-	let darkpool = FheDarkPool::new(sk);
+	let darkpool = FheDarkPool::new(sk, ITEMS);
 	let (enc_b_fulfilled, enc_s_fulfilled) = darkpool.volume_matching(
 		enc_b_orders,
 		enc_s_orders,
