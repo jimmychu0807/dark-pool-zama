@@ -23,10 +23,11 @@ fn main() {
 	// let enc_b_orders = encrypt_orders(b_orders.clone(), &client_key);
 	// let enc_s_orders = encrypt_orders(s_orders.clone(), &client_key);
 
-	// server-side
+	// server-side processing
 	let dp = PlainDarkPool::new();
-	let result = dp.volume_matching(b_orders, s_orders);
+	let (b_fulfilled, s_fulfilled) = dp.volume_matching(b_orders, s_orders);
 
 	// client-side
-	// let matched_result = decrypt_txs(enc_result, &client_key);
+	println!("b_fulfilled: {:?}", b_fulfilled);
+	println!("s_fulfilled: {:?}", s_fulfilled);
 }
