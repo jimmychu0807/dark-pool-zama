@@ -17,3 +17,9 @@ build-remote:
 .PHONY: fmt
 fmt:
 	cargo fmt
+
+.PHONY: example
+example:
+	cargo remote -r dev -- run -r --example $(filter-out $@,$(MAKECMDGOALS))
+%::
+	@:

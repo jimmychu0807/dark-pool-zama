@@ -1,4 +1,4 @@
-use dark_pool::EncItemQty;
+use crate::EncItemQty;
 use tfhe::prelude::*;
 use tfhe::{ClientKey, FheUint32};
 
