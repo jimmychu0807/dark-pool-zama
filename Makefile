@@ -8,18 +8,18 @@ check-remote:
 
 .PHONY: build
 build:
-	cargo build -r
+	cargo build -r --all --examples
 
 .PHONY: build-remote
 build-remote:
-	cargo remote -r dev -- build -r
+	cargo remote -r dev -- build -r --all --examples
 
 .PHONY: fmt
 fmt:
 	cargo fmt
 
-.PHONY: example
-example:
+.PHONY: example-remote
+example-remote:
 	cargo remote -r dev -- run -r --example $(filter-out $@,$(MAKECMDGOALS))
 %::
 	@:
