@@ -21,5 +21,10 @@ fmt:
 .PHONY: example-remote
 example-remote:
 	cargo remote -r dev -- run -r --example $(filter-out $@,$(MAKECMDGOALS))
+
+.PHONY: test-remote
+test-remote:
+	cargo remote -r dev -- test -r -- --nocapture
+
 %::
 	@:

@@ -35,6 +35,30 @@ impl DarkPool<EncItemQty> for FheDarkPool {
 			aggregate
 		};
 
+		let fulfill_orders =
+			|orders: &Vec<EncItemQty>, mut transact_items: Vec<FheUint32>| -> Vec<EncItemQty> {
+				let mut transacted_orders = Vec::<EncItemQty>::new();
+
+				let enc_zero = FheUint32::try_encrypt_trivial(0u32).unwrap();
+
+				for order in orders {
+					let mut tx_qty = enc_zero.clone();
+
+					for j in 0..transact_items.len() {
+						let enc_j = FheUint32::try_encrypt_trivial(j as u32).unwrap();
+
+						// Is the current `transact_items[j]` matches with `orders[i].0`?
+						let b_item = enc_j.eq(&order.0);
+						tx_qty = tx_qty.max(&b_item.select(&order.1.min(&transact_items[j]), &enc_zero));
+
+						// update transact_items how much qty left after this order is fulfilled
+						transact_items[j] -= b_item.select(&tx_qty, &enc_zero);
+					}
+					transacted_orders.push((order.0.clone(), tx_qty));
+				}
+				transacted_orders
+			};
+
 		let agg_buy = aggregate_orders(&enc_b_orders);
 		let agg_sell = aggregate_orders(&enc_s_orders);
 
@@ -42,30 +66,6 @@ impl DarkPool<EncItemQty> for FheDarkPool {
 		for i in 0..agg_buy.len() {
 			transact_items.push(agg_buy[i].min(&agg_sell[i]));
 		}
-
-		let fulfill_orders =
-			|orders: &Vec<EncItemQty>, mut transact_items: Vec<FheUint32>| -> Vec<EncItemQty> {
-				let mut transacted_orders = Vec::<EncItemQty>::new();
-
-				let enc_zero = FheUint32::try_encrypt_trivial(0u32).unwrap();
-
-				for i in 0..orders.len() {
-					let mut tx_qty = enc_zero.clone();
-
-					for j in 0..transact_items.len() {
-						let enc_j = FheUint32::try_encrypt_trivial(j as u32).unwrap();
-
-						// Is the current `transact_items[j]` matches with `orders[i].0`?
-						let b_item = enc_j.eq(&orders[i].0);
-						tx_qty = tx_qty.max(&b_item.select(&orders[i].1.min(&transact_items[j]), &enc_zero));
-
-						// update transact_items how much qty left after this order is fulfilled
-						transact_items[j] -= b_item.select(&tx_qty, &enc_zero);
-					}
-					transacted_orders.push((orders[i].0.clone(), tx_qty));
-				}
-				transacted_orders
-			};
 
 		let b_fulfilled = fulfill_orders(&enc_b_orders, transact_items.clone());
 		let s_fulfilled = fulfill_orders(&enc_s_orders, transact_items.clone());
