@@ -3,7 +3,7 @@ use tfhe::{ClientKey, FheUint32};
 
 use crate::{EncItemQty, ItemQty};
 
-pub fn encrypt_orders(orders: &Vec<ItemQty>, ck: &ClientKey) -> Vec<EncItemQty> {
+pub fn encrypt_orders(orders: &[ItemQty], ck: &ClientKey) -> Vec<EncItemQty> {
 	orders.iter().map(|(v1, v2)| (FheUint32::encrypt(*v1, ck), FheUint32::encrypt(*v2, ck))).collect()
 }
 
