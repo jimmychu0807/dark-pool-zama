@@ -79,9 +79,15 @@ fn handle_simple_case() {
 	println!("match volume: {:?}", volume_matched);
 	println!("decryption: {:?}", decrypted);
 
+	// In a 16-core barebone machine
 	// encrypt orders: 22.824481ms
 	// match volume: 28.822627314s
 	// decryption: 28.823213014s
+
+	// with cloud machine - with GPU RTX 6000 Ada
+	// encrypt orders: 18.763443ms
+	// match volume: 7.942746173s
+	// decryption: 7.943555969s
 }
 
 #[test]
