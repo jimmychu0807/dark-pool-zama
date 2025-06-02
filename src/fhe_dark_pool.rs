@@ -23,13 +23,16 @@ impl DarkPool<EncItemQty> for FheDarkPool {
 		enc_s_orders: Vec<EncItemQty>,
 	) -> (Vec<EncItemQty>, Vec<EncItemQty>) {
 		// NX> loop thru the enc_b_orders here
+		let enc_zero = FheUint32::try_encrypt_trivial(0u32).unwrap();
+
 		let aggregate_orders = |enc_orders: &Vec<EncItemQty>| -> Vec<FheUint32> {
 			let mut aggregate: Vec<FheUint32> =
 				(0..self.max_items).map(|_| FheUint32::try_encrypt_trivial(0u32).unwrap()).collect();
 			for i in 0..self.max_items {
 				let enc_i = FheUint32::try_encrypt_trivial(i).unwrap();
 				for (ok, oq) in enc_orders {
-					aggregate[i as usize] += enc_i.eq(ok).scalar_select(oq, 0u32);
+					// note: avoid `scalar_select()` here as it doesn't support GPU
+					aggregate[i as usize] += enc_i.eq(ok).select(oq, &enc_zero);
 				}
 			}
 			aggregate
@@ -38,8 +41,6 @@ impl DarkPool<EncItemQty> for FheDarkPool {
 		let fulfill_orders =
 			|orders: &Vec<EncItemQty>, mut transact_items: Vec<FheUint32>| -> Vec<EncItemQty> {
 				let mut transacted_orders = Vec::<EncItemQty>::new();
-
-				let enc_zero = FheUint32::try_encrypt_trivial(0u32).unwrap();
 
 				for order in orders {
 					let mut tx_qty = enc_zero.clone();
